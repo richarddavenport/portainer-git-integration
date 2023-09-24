@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  registry:
+    image: registry:2
+    restart: always
+    environment:
+      REGISTRY_AUTH: htpasswd
+      REGISTRY_AUTH_HTPASSWD_PATH: /auth/htpasswd
+      REGISTRY_AUTH_HTPASSWD_REALM: Registry Realm
+    volumes:
+      - registry_data:/var/lib/registry
+      - ./volumes/auth:/auth
+
+  portainer:
+    image: portainer/portainer-ce:2.19.1
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer_data:/data
+
+  caddy:
+    image: caddy:2.7.4
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./volumes/caddy/data:/data
+      - ./volumes/caddy/config:/config
+    command: ["caddy", "run", "--config", "/config/Caddyfile"]
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:rw
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    ports:
+      - 7070:8080
+    platform: linux/amd64
+    privileged: true
+
+  web:
+    image: registry.butlermfgparts.localhost/mar-web
+    container_name: mar-web
+
+  # watchtower:
+  #   image: containrrr/watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ~/.docker/config.json:/config.json
+  #     - ./volumes/caddy/data/caddy/pki/authorities/local/root.crt:/etc/ssl/certs/root.crt
+  #   command: mar-web --interval 10 --debug
+  #   extra_hosts:
+  #     butlermfgparts.localhost: host-gateway
+  #     registry.butlermfgparts.localhost: host-gateway
+
+volumes:
+  portainer_data:
+  registry_data:

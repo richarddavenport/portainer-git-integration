@@ -1,0 +1,15 @@
+butlermfgparts.localhost {
+	handle {
+		reverse_proxy web:3000
+	}
+
+	tls internal
+}
+
+registry.butlermfgparts.localhost {
+	handle {
+		reverse_proxy registry:5000
+	}
+
+	tls internal
+}
