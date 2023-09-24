@@ -13,3 +13,11 @@ registry.butlermfgparts.localhost {
 
 	tls internal
 }
+
+portainer.butlermfgparts.localhost {
+	handle {
+		reverse_proxy portainer:9000
+	}
+
+	tls internal
+}
