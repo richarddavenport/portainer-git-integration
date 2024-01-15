@@ -1,0 +1,12 @@
+version: "3.8"
+
+services:
+  graphql-engine:
+    image: hasura/graphql-engine:${HASURA_VERSION}
+    healthcheck:
+      interval: 4s
+      timeout: 2s
+      retries: 3
+    restart: unless-stopped
+    ports:
+      - "${HASURA_GRAPHQL_SERVER_PORT}:${HASURA_GRAPHQL_SERVER_PORT}"
